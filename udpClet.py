@@ -6,6 +6,7 @@ from contextlib import closing
 
 def main():
     host = '127.0.0.1'
+#     host = 'ahiru.kek.jp'
     port = 14512
     buff = 1024
     user = 'Client'
