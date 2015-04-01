@@ -3,16 +3,24 @@
 
 HOST = '192.168.10.16'
 PORT = 4660
-BUFF = 512
+BUFF = 255
 
 VER_TYPE    = 0xff
 CMD_FLAG_TX = 0x80
 CMD_FLAG_RX = 0xc0
 PKT_ID      = 0x00
-DATA_LENGTH = 0x05
+DATA_LENGTH = 0x01
 
 from struct import pack, unpack
 from socket import socket, AF_INET, SOCK_DGRAM
+from random import randint
+
+class RBCPError(Exception):
+    def __init__(self, msg):
+        self.msg = 'RBCP Error: %s' % str(msg)
+
+    def __str__(self):
+        return self.msg
 
 class RBCP(object):
     def __init__(self, host=HOST, port=PORT, buff=BUFF):
@@ -25,26 +33,44 @@ class RBCP(object):
         self.sock.close()
         del self
 
-    def header(self, cmd, id=PKT_ID, d_len=DATA_LENGTH):
-        return [VER_TYPE, cmd, id, d_len]
-
     def write(self, addr, data):
-        p = self.header(CMD_FLAG_TX) + conv_int_list(addr) + conv_int_list(data)
-        pkt = pack('13B', *p)
+        d_len = len(data)/2 # byte
+        if d_len > 247:
+            raise RBCPError('Data is too long. Data length must be less than 247 bytes.')
+        p   = [VER_TYPE, CMD_FLAG_TX, PKT_ID, d_len]
+        p  += conv_int_list(addr)
+        p  += conv_int_list(data)
+        pkt = pack(str(8+d_len) + 'B', *p)
         self.sock.sendto(pkt, (self.host, self.port))
         data, addr = self.sock.recvfrom(self.buff)
         return data, addr
 
-    def read(self, addr, data='00'*5):
-        if len(addr) != 8:
-            print 'Address length is mismatch (%d given)' % len(addr)
-            print 'Address must be 8 length'
-            exit
-        p = self.header(CMD_FLAG_RX) + conv_int_list(addr) + conv_int_list(data)
-        pkt = pack('13B', *p)
+    def read(self, addr, d_len=DATA_LENGTH):
+        p   = [VER_TYPE, CMD_FLAG_RX, PKT_ID, d_len]
+        p  += conv_int_list(str(addr))
+        pkt = pack('8B', *p)
         self.sock.sendto(pkt, (self.host, self.port))
         data, addr = self.sock.recvfrom(self.buff)
         return data, addr
+
+    def wr(self, addr='0000f000', data='aa'):
+        d_len = len(data)/2 # byte
+        data, addr = self.write(addr, data)
+        bus = [hex(x) for x in unpack(str(8+d_len) + 'B', data)]
+        if bus[1] == 137: # 137 = 0x89
+            raise RBCPError('Bus Error.')
+        b_addr = bus[4:8]
+        b_data = bus[8:]
+        return b_addr, b_data
+
+    def rd(self, addr='0000f000', d_len=DATA_LENGTH):
+        data, addr = self.read(addr, d_len)
+        bus = [hex(x) for x in unpack(str(8+d_len) + 'B', data)]
+        if bus[1] == 201: # 201 = 0xc9
+            raise RBCPError('Bus Error.')
+        b_addr = bus[4:8]
+        b_data = bus[8:]
+        return b_addr, b_data
 
 def split_str(str, n):
     return [str[i:i+n] for i in range(0, len(str), n)]

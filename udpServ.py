@@ -23,7 +23,7 @@ def main():
                 reg_data = '0000'
                 ss.sendto(reg_data, addr)
             elif msg[1] == '\x80': # write
-                print 'Recived data is %x%x%x%x%x' % unpack('5B', msg[8:13])
+                print 'Recived data is %x' % unpack('B', msg[8:9])
                 print 'Write ADC %x%x%x%x register' % unpack('4B', msg[4:8])
                 ss.sendto('Write succeessful!', addr)
             else:
