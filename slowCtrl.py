@@ -13,7 +13,6 @@ DATA_LENGTH = 0x01
 
 from struct import pack, unpack
 from socket import socket, AF_INET, SOCK_DGRAM
-from random import randint
 
 class RBCPError(Exception):
     def __init__(self, msg):
@@ -53,21 +52,23 @@ class RBCP(object):
         data, addr = self.sock.recvfrom(self.buff)
         return data, addr
 
-    def wr(self, addr='0000f000', data='aa'):
+    def wr(self, addr='10000000', data='01'):
         d_len = len(data)/2 # byte
         data, addr = self.write(addr, data)
+        if d_len == 0: raise RBCPError('Bus Error: Data lost')
         bus = [hex(x) for x in unpack(str(8+d_len) + 'B', data)]
         if bus[1] == 137: # 137 = 0x89
-            raise RBCPError('Bus Error.')
+            raise RBCPError('Bus Error')
         b_addr = bus[4:8]
         b_data = bus[8:]
         return b_addr, b_data
 
-    def rd(self, addr='0000f000', d_len=DATA_LENGTH):
+    def rd(self, addr='20000005', d_len=DATA_LENGTH):
         data, addr = self.read(addr, d_len)
+        if d_len == 0: raise RBCPError('Bus Error: Data lost')
         bus = [hex(x) for x in unpack(str(8+d_len) + 'B', data)]
         if bus[1] == 201: # 201 = 0xc9
-            raise RBCPError('Bus Error.')
+            raise RBCPError('Bus Error')
         b_addr = bus[4:8]
         b_data = bus[8:]
         return b_addr, b_data
