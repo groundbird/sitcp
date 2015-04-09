@@ -5,11 +5,23 @@ HOST = '192.168.10.16'
 PORT = 4660
 BUFF = 255
 
+# RBCP packet format
 VER_TYPE    = 0xff
 CMD_FLAG_TX = 0x80
 CMD_FLAG_RX = 0xc0
 PKT_ID      = 0x00
 DATA_LENGTH = 0x01
+
+# ads4249/dac3283 register map
+ADDR_ADC = ['00', '01', '03', '25', '29', '2b', '3d', '3f',
+            '40', '41', '42', '45', '4a', '58', 'bf', 'c1',
+            'cf', 'ef', 'f1', 'f2', '02', 'd5', 'd7', 'db']
+DATA_ADC = ['00' for i in range(24)]
+ADDR_DAC = ['%02X' % i for i in range(32)]
+DATA_DAC = ['70', '11', '00', '10', 'ff', '00', '00', '00',
+            '00', '7a', 'b6', 'ea', '45', '1a', '16', 'aa',
+            'c6', '24', '02', '00', '00', '00', '00', '04',
+            '83', '00', '00', '00', '00', '00', '24', '12']
 
 from struct import pack, unpack
 from socket import socket, AF_INET, SOCK_DGRAM
@@ -39,7 +51,7 @@ class RBCP(object):
         p   = [VER_TYPE, CMD_FLAG_TX, PKT_ID, d_len]
         p  += conv_int_list(addr)
         p  += conv_int_list(data)
-        pkt = pack(str(8+d_len) + 'B', *p)
+        pkt = pack(str(8+d_len)+'B', *p)
         self.sock.sendto(pkt, (self.host, self.port))
         data, addr = self.sock.recvfrom(self.buff)
         return data, addr
@@ -52,29 +64,130 @@ class RBCP(object):
         data, addr = self.sock.recvfrom(self.buff)
         return data, addr
 
-    def wr(self, addr='10000000', data='01'):
+    def wr(self, addr, data):
         d_len = len(data)/2 # byte
         data, addr = self.write(addr, data)
         if d_len == 0: raise RBCPError('Bus Error: Data lost')
-        bus = [hex(x) for x in unpack(str(8+d_len) + 'B', data)]
-        if bus[1] == 137: # 137 = 0x89
+        bus = [hex(x) for x in unpack(str(8+d_len)+'B', data)]
+        if bus[1] == '0x89':
             raise RBCPError('Bus Error')
         b_addr = bus[4:8]
         b_data = bus[8:]
         return b_addr, b_data
 
-    def rd(self, addr='20000005', d_len=DATA_LENGTH):
+    def rd(self, addr, d_len=DATA_LENGTH):
         data, addr = self.read(addr, d_len)
         if d_len == 0: raise RBCPError('Bus Error: Data lost')
-        bus = [hex(x) for x in unpack(str(8+d_len) + 'B', data)]
-        if bus[1] == 201: # 201 = 0xc9
+        bus = [hex(x) for x in unpack(str(8+d_len)+'B', data)]
+        if bus[1] == '0xc9':
             raise RBCPError('Bus Error')
         b_addr = bus[4:8]
         b_data = bus[8:]
         return b_addr, b_data
+
+    def adc_reset(self):
+        self.wr('10000000', '02')
+
+    def adc_read_enable(self):
+        self.wr('10000000', '01')
+
+    def dac_4ena(self):
+        self.wr('20000017', '04')
+
+#     def wr_adc(self, regAddr=None, regData=None):
+#         if regData == None: regData = DATA_ADC
+#         if regAddr != None and len(regAddr) != len(regData):
+#             raise RBCPError('Address and Data must be the same length.')
+#         self.adc_reset()
+#         print 'Write ADC Register:\n'
+#         if regAddr == None and regData == DATA_ADC: # default
+#             for addr, data in zip(ADDR_ADC[1:], regData[1:]):
+#                 a, d = self.wr('100000'+addr, data)
+#                 print '\t[%02X] <= %02X' % (int(a[3], 16), int(d[0], 16))
+#         elif regAddr in ADDR_ADC:
+#             addr, data = self.wr('100000'+regAddr, regData)
+#             print '\t[%02X] <= %02X' % (int(addr[3], 16), int(data[0], 16))
+#         else:
+#             raise RBCPError('Address and Data must be string.')
+
+    def wr_adc(self, regAddr=None, regData=None):
+        self.adc_reset()
+        if (regAddr is None) and (regData is None):
+            regAddr, regData = ADDR_ADC[1:], DATA_ADC[1:] # pass addr: 00
+        if isinstance(regAddr, str) and isinstance(regData, str):
+            addr, data = self.wr('100000'+regAddr, regData)
+            print '\t[%02X] <= %02X' % (int(addr[3], 16), int(data[0], 16))
+        elif isinstance(regAddr, list) and isinstance(regData, list):
+            for addr, data in zip(regAddr, regData):
+                _addr, _data = self.wr('100000'+addr, data)
+                print '\t[%02X] <= %02X' % (int(_addr[3], 16), int(_data[0], 16))
+        else:
+            raise RBCPError('Write failed.')
+
+    def rd_adc(self, regAddr=None):
+        self.adc_read_enable()
+        if regAddr == None:
+            for addr in ADDR_ADC[1:]:
+                a, d = self.rd('110000'+addr)
+                print '\t[%02X]: %02X' % (int(a[3], 16), int(d[0], 16))
+        elif regAddr in ADDR_ADC:
+            addr, data = self.rd('110000'+regAddr)
+            print '\t[%02X]: %02X' % (int(addr[3], 16), int(data[0], 16))
+        else:
+            raise RBCPError('Address must be string.')            
+
+#     def wr_dac(self, regAddr=None, regData=None):
+#         if regData == None: regData = DATA_DAC
+#         if regAddr != None and len(regAddr) != len(regData):
+#             raise RBCPError('Address and Data must be the same length.')
+#         self.dac_4ena()
+#         print 'Write DAC Register:\n'
+#         if regAddr == None and regData == DATA_DAC:
+#             for addr, data in zip(ADDR_DAC, regData):
+#                 a, d = self.wr('200000'+addr, data)
+#                 print '\t[%02X] <= %02X' % (int(a[3], 16), int(d[0], 16))
+#         elif regAddr in ADDR_DAC:
+#             addr, data = self.wr('200000'+regAddr, regData)
+#             print '\t[%02X] <= %02X' % (int(addr[3], 16), int(data[0], 16))
+#         else:
+#             raise RBCPError('Address and Data must be string.')
+
+    def wr_dac(self, regAddr=None, regData=None):
+        self.dac_4ena()
+        if (regAddr is None) and (regData is None):
+            regAddr, regData = ADDR_DAC, DATA_DAC
+        if isinstance(regAddr, str) and isinstance(regData, str):
+            addr, data = self.wr('200000'+regAddr, regData)
+            print '\t[%02X] <= %02X' % (int(addr[3], 16), int(data[0], 16))
+        elif isinstance(regAddr, list) and isinstance(regData, list):
+            for addr, data in zip(regAddr, regData):
+                _addr, _data = self.wr('200000'+addr, data)
+                print '\t[%02X] <= %02X' % (int(_addr[3], 16), int(_data[0], 16))
+        else:
+            raise RBCPError('Write failed.')
+
+    def rd_dac(self, regAddr=None):
+        self.dac_4ena()
+        if regAddr is None:
+            for addr in ADDR_DAC:
+                a, d = self.rd('210000'+addr)
+                print '\t[%02X]: %02X' % (int(a[3], 16), int(d[0], 16))
+        elif regAddr in ADDR_DAC:
+            addr, data = self.rd('210000'+regAddr)
+            print '\t[%02X]: %02X' % (int(addr[3], 16), int(data[0], 16))
+        else:
+            raise RBCPError('Read failed.')
+
 
 def split_str(str, n):
     return [str[i:i+n] for i in range(0, len(str), n)]
 
 def conv_int_list(str):
     return [int(x, 16) for x in split_str(str, 2)]
+
+def dict_reg(addr, data):
+    if len(addr) != len(data):
+        raise Exception('Error: Addess and Data length must be same')
+    reg = dict()
+    for a, d in zip(addr, data): reg[a] = d
+    return reg
