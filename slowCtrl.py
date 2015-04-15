@@ -90,28 +90,15 @@ class RBCP(object):
 
     def adc_read_enable(self):
         self.wr('10000000', '01')
+    
+    def adc_write_enable(self):
+        self.wr('10000000', '00')
 
     def dac_4ena(self):
         self.wr('20000017', '04')
 
-#     def wr_adc(self, regAddr=None, regData=None):
-#         if regData == None: regData = DATA_ADC
-#         if regAddr != None and len(regAddr) != len(regData):
-#             raise RBCPError('Address and Data must be the same length.')
-#         self.adc_reset()
-#         print 'Write ADC Register:\n'
-#         if regAddr == None and regData == DATA_ADC: # default
-#             for addr, data in zip(ADDR_ADC[1:], regData[1:]):
-#                 a, d = self.wr('100000'+addr, data)
-#                 print '\t[%02X] <= %02X' % (int(a[3], 16), int(d[0], 16))
-#         elif regAddr in ADDR_ADC:
-#             addr, data = self.wr('100000'+regAddr, regData)
-#             print '\t[%02X] <= %02X' % (int(addr[3], 16), int(data[0], 16))
-#         else:
-#             raise RBCPError('Address and Data must be string.')
-
     def wr_adc(self, regAddr=None, regData=None):
-        self.adc_reset()
+        self.adc_write_enable()
         if (regAddr is None) and (regData is None):
             regAddr, regData = ADDR_ADC[1:], DATA_ADC[1:] # pass addr: 00
         if isinstance(regAddr, str) and isinstance(regData, str):
@@ -135,22 +122,6 @@ class RBCP(object):
             print '\t[%02X]: %02X' % (int(addr[3], 16), int(data[0], 16))
         else:
             raise RBCPError('Address must be string.')            
-
-#     def wr_dac(self, regAddr=None, regData=None):
-#         if regData == None: regData = DATA_DAC
-#         if regAddr != None and len(regAddr) != len(regData):
-#             raise RBCPError('Address and Data must be the same length.')
-#         self.dac_4ena()
-#         print 'Write DAC Register:\n'
-#         if regAddr == None and regData == DATA_DAC:
-#             for addr, data in zip(ADDR_DAC, regData):
-#                 a, d = self.wr('200000'+addr, data)
-#                 print '\t[%02X] <= %02X' % (int(a[3], 16), int(d[0], 16))
-#         elif regAddr in ADDR_DAC:
-#             addr, data = self.wr('200000'+regAddr, regData)
-#             print '\t[%02X] <= %02X' % (int(addr[3], 16), int(data[0], 16))
-#         else:
-#             raise RBCPError('Address and Data must be string.')
 
     def wr_dac(self, regAddr=None, regData=None):
         self.dac_4ena()
