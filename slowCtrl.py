@@ -149,6 +149,8 @@ class RBCP(object):
         else:
             raise RBCPError('Read failed.')
 
+    def adc_snapshot(self):
+        self.wr('30000000', '00')
 
 def split_str(str, n):
     return [str[i:i+n] for i in range(0, len(str), n)]
