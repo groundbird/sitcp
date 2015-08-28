@@ -12,7 +12,6 @@ from time import sleep
 from argparse import ArgumentParser
 import numpy as np
 
-
 def fixed(readout_obj, dsize, ds=DOWNSAMPLE_RATE):
     dsize = int(dsize)
     data  = readout_obj.read(dsize)
@@ -26,8 +25,11 @@ def fixed(readout_obj, dsize, ds=DOWNSAMPLE_RATE):
     return ts, i, q
 
 def fixed2file(readout_obj, fname, dsize):
+#     if binary:
+#         fname = '%s.bin' % fname
+#     else:
+#         fname = '%s.dat' % fname
     with open(fname, 'wb') as f:
-        count = 0
         if dsize < BUFF:
             data = readout_obj.read(dsize)
             if len(data) != dsize:
@@ -41,13 +43,13 @@ def fixed2file(readout_obj, fname, dsize):
                     data = readout_obj.read()
                     f.write(data)
                     f.flush()
-                    count += 1
                 except KeyboardInterrupt:
                     print '\nStopped readout (%d bytes).' % getsize(fname)
                     break
                 except error as e:
                     print e
                     break
+
 
 if __name__ == '__main__':
     # Command-line options
@@ -76,6 +78,13 @@ if __name__ == '__main__':
         dest    = 'time',
         help    = 'The observation time. The default value is 1 (1 sec).',
         metavar = 's')
+    g.add_argument(
+        # Save file option
+        '-b',
+        '--binary',
+        action = 'store_true',
+        dest   = 'binary',
+        help   = 'Output file type. The deault type is text.')
     args = p.parse_args()
 
     date   = datetime.today()
@@ -83,6 +92,7 @@ if __name__ == '__main__':
     freq   = args.freq
     sample = args.time * (SAMPLE_RATE/DOWNSAMPLE_RATE)
     dsize  = int(sample*DATA_UNIT)
+    binary = args.binary
 
     # Generate instance and connect
     s = RBCP()
@@ -104,11 +114,21 @@ if __name__ == '__main__':
         system('mv %s.aa %s' % (fname, fname))
         system('rm %s.*' % fname)
 
+    # Convert binary to text
+    if not binary:
+        with open(fname, 'r') as f:
+            bd = f.read()
+            td = conv_iq_data(np.array(unpack('B'*len(bd), bd)))
+            with open(fname[:-3]+'dat', 'w') as _f:
+                for d in zip(*td):
+                    print >> _f, '%d\t%+e\t%+e' % d
+
     # Debug
     fsize = getsize(fname)
     if fsize == dsize:
         print 'Succeeded in readout (%d bytes).' % fsize
         print 'Bye-Bye (^_^)/~'
+        if not binary: system('rm %s' % fname) # Remove binary file
     else:
         print 'Failed in readout.'
         print 'Dropped %d bytes data.' % (dsize-fsize)

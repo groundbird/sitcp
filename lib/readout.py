@@ -21,8 +21,6 @@ from errno import EWOULDBLOCK, ETIMEDOUT
 from slowCtrl import RBCPError, RBCP
 import numpy as np
 
-r = RBCP()
-
 class ReadoutError(Exception):
     def __init__(self, msg):
         self.msg = '%s' % str(msg)

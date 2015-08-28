@@ -79,7 +79,6 @@ Frequency [Hz]\tI\t\tQ
 
 with open(fname, 'w') as f:
     for freq in fran:
-
         try:
             s.set_freq(freq)
             r.clear()

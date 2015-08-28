@@ -171,6 +171,10 @@ class RBCP(object):
         else:
             self.wr('40000000', format(int(freq/FS*2**32), 'x').zfill(8))
 
+    def check_freq(self):
+        return self.rd('61000000', 0x01)
+        
+
     def register_init(self):
         """
         Initialize ADC/DAC register
