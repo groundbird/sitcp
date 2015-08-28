@@ -63,6 +63,7 @@ r = Readout()
 r.connect()
 
 # Begin the readout sequence
+s.register_init
 j = 0 # readout on/off when j is odd/even
 print """
 Start frequency sweep readout.

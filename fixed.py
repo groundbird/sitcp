@@ -100,6 +100,7 @@ if __name__ == '__main__':
     r.connect()
 
     # Begin the readout sequence
+    s.register_init
     s.set_freq(freq)
     s.iq_rd() # on
     fixed2file(r, fname, dsize)

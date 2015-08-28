@@ -107,11 +107,17 @@ class RBCP(object):
             regAddr, regData = ADDR_ADC[1:], DATA_ADC[1:]
         if isinstance(regAddr, str) and isinstance(regData, str):
             addr, data = self.wr('100000'+regAddr, regData)
-            print '\t[%02X] <= %02X' % (int(addr[3], 16), int(data[0], 16))
+#             print '\t[%02X] <= %02X' % (int(addr[3], 16), int(data[0], 16))
+            return addr, data
         elif isinstance(regAddr, list) and isinstance(regData, list):
+            addr_list = []
+            data_list = []
             for addr, data in zip(regAddr, regData):
                 _addr, _data = self.wr('100000'+addr, data)
-                print '\t[%02X] <= %02X' % (int(_addr[3], 16), int(_data[0], 16))
+                addr_list.append(_addr)
+                data_list.append(_data)
+#                 print '\t[%02X] <= %02X' % (int(_addr[3], 16), int(_data[0], 16))
+            return addr_list, data_list
         else:
             raise RBCPError('Write failed.')
 
@@ -133,11 +139,17 @@ class RBCP(object):
             regAddr, regData = ADDR_DAC, DATA_DAC
         if isinstance(regAddr, str) and isinstance(regData, str):
             addr, data = self.wr('200000'+regAddr, regData)
-            print '\t[%02X] <= %02X' % (int(addr[3], 16), int(data[0], 16))
+#             print '\t[%02X] <= %02X' % (int(addr[3], 16), int(data[0], 16))
+            return addr, data
         elif isinstance(regAddr, list) and isinstance(regData, list):
+            addr_list = []
+            data_list = []
             for addr, data in zip(regAddr, regData):
                 _addr, _data = self.wr('200000'+addr, data)
-                print '\t[%02X] <= %02X' % (int(_addr[3], 16), int(_data[0], 16))
+                addr_list.append(_addr)
+                data_list.append(_data)
+            return addr_list, data_list
+#                 print '\t[%02X] <= %02X' % (int(_addr[3], 16), int(_data[0], 16))
         else:
             raise RBCPError('Write failed.')
 
@@ -173,14 +185,15 @@ class RBCP(object):
 
     def check_freq(self):
         return self.rd('61000000', 0x01)
-        
 
+    @property
     def register_init(self):
         """
         Initialize ADC/DAC register
         """
         self.wr_adc('42', 'f8')                 # delay data clock
         self.wr_dac(['01', '13'], ['01', 'c0']) # disable interpolation
+
 
 def split_str(str, n):
     return [str[i:i+n] for i in range(0, len(str), n)]
