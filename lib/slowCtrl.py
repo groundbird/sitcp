@@ -27,6 +27,7 @@ FS = 200e6 # ADC sample rate
 
 from struct import pack, unpack
 from socket import socket, AF_INET, SOCK_DGRAM, timeout
+from time import sleep
 
 class RBCPError(Exception):
     def __init__(self, msg):
@@ -41,7 +42,7 @@ class RBCP(object):
         self.port = port
         self.buff = buff
         self.sock = socket(AF_INET, SOCK_DGRAM)
-        self.sock.setblocking(0)
+#         self.sock.setblocking(1)
         self.sock.settimeout(1)
 
     def __del__(self):
@@ -49,15 +50,19 @@ class RBCP(object):
         del self
 
     def write(self, addr, data):
-        d_len = len(data)/2 # byte
-        if d_len > 247:
+        d_len = len(data)/2 # bytes
+#         if d_len > 247:
+        if d_len > BUFF-8: # VER_TYPE + CMD_FLAG + ID + ADDR = 8 bytes
             raise RBCPError('Data is long. Data length must be less than 247 bytes.')
         p   = [VER_TYPE, CMD_FLAG_TX, PKT_ID, d_len]
         p  += conv_int_list(addr)
         p  += conv_int_list(data)
+#         print p
         pkt = pack(str(8+d_len)+'B', *p)
         self.sock.sendto(pkt, (self.host, self.port))
         data, addr = self.sock.recvfrom(self.buff)
+        if data[1] == '\x89':
+            raise RBCPError('Write failed')
         return data, addr
 
     def read(self, addr, d_len=DATA_LENGTH):
@@ -69,12 +74,17 @@ class RBCP(object):
         return data, addr
 
     def wr(self, addr, data):
-        d_len = len(data)/2 # byte
-        data, addr = self.write(addr, data)
+        d_len = len(data)/2 # bytes
+        _data, _addr = self.write(addr, data)
         if d_len == 0: raise RBCPError('Bus Error: Data lost')
-        bus = [hex(x) for x in unpack(str(8+d_len)+'B', data)]
-        if bus[1] == '0x89':
-            raise RBCPError('Bus Error')
+        if 8+d_len != len(_data): # debug
+            print 'd_len = %d' % (8+d_len)
+            print '_data = %d' % len(_data)
+            print addr, data
+            print unpack(str(len(_data))+'B', _data)
+        bus = [hex(x) for x in unpack(str(8+d_len)+'B', _data)]
+#         if bus[1] == '0x89':
+#             raise RBCPError('Bus Error')
         b_addr = bus[4:8]
         b_data = bus[8:]
         return b_addr, b_data
@@ -168,23 +178,59 @@ class RBCP(object):
     def adc_snapshot(self):
         self.wr('30000000', '00')
 
-    def iq_rd(self):
+    @property
+    def iq_tgl(self):
         self.wr('50000000', '00')
-    
-    def reset(self):
-        try:
-            self.wr('f0000000', '00')
-        except timeout:
-            pass
+
+#     @property
+#     def iq_off(self):
+#         self.wr('51000000', '00')
+
+    @property
+    def chk_stat(self):
+        return self.rd('60000000')
+#         addr, data = self.rd('60000000')
+#         if data == '\0x01':
+#             return 'busy'
+#         else:
+#             return 'idle'
+
+#     @property
+#     def reset(self):
+#         try:
+#             self.wr('f0000000', '00')
+#         except timeout:
+#             pass
+
+    @property
+    def sitcp_reset(self):
+        """
+        SiTCP Reset
+        (see http://goo.gl/kDX7MK)
+        """
+        print 'SiTCP Reset\nWait 10 seconds...'
+        self.wr('ffffff10', '81') # SiTCP Reset
+        sleep(10)                 # build up time (> 8 sec)
+        self.wr('ffffff10', '01') # RBCP_ACT <= '1'
 
     def set_freq(self, freq=1e6): # freq [Hz]
+#         try:
         if freq < 0:
-            self.wr('40000000', format(int((FS+freq)/FS*2**32), 'x').zfill(8))
+            d = format(int((FS+freq)/FS*2**32), 'x').zfill(8)
+            self.wr('40000000', d)
         else:
-            self.wr('40000000', format(int(freq/FS*2**32), 'x').zfill(8))
+            d = format(int(freq/FS*2**32), 'x').zfill(8)
+            self.wr('40000000', d)
+#         except RBCPError as e:
+# #             if e.msg == 'Bus Error: write failed':
+#             print e
+# #                 print 'Retry'
+#             self.reset_sitcp
+#             sleep(10)
+#             self.set_freq(freq)
 
-    def check_freq(self):
-        return self.rd('61000000', 0x01)
+#     def check_freq(self):
+#         return self.rd('61000000', 0x01)
 
     @property
     def register_init(self):

@@ -12,6 +12,8 @@ from time import sleep
 from argparse import ArgumentParser
 from fixed import *
 
+__version__ = '0.0.1'
+
 # Command-line options
 p = ArgumentParser(
     description = 'Take the frequency sweep readout data.')
@@ -51,8 +53,8 @@ g.add_argument(
     metavar = 's')
 args = p.parse_args()
 
-date   = datetime.today()
-fname  = 'data/sweep_%s.dat' % date.strftime('%Y%m%d_%H%M%S')
+date   = datetime.utcnow()
+fname  = 'data/sweep_%s.csv' % date.strftime('%Y%m%d_%H%M%S')
 fran   = np.arange(args.fran[0], args.fran[1]+args.step, args.step)
 sample = args.time * (SAMPLE_RATE/DOWNSAMPLE_RATE)
 dsize  = int(sample*DATA_UNIT) # KB
@@ -63,12 +65,14 @@ r = Readout()
 r.connect()
 
 # Begin the readout sequence
-s.register_init
-j = 0 # readout on/off when j is odd/even
+s.wr_adc()      # Reset ADC register
+s.wr_dac()      # Reset DAC register
+s.register_init # Initialize ADC/DAC register
+
 print """
 Start frequency sweep readout.
 --------------------------------------------------
-Date             : %s
+Date             : %s UTC
 Frequency range  : %.2e to %.2e Hz
 Frequency steps  : %.2e Hz
 Observation time : %s sec
@@ -79,21 +83,49 @@ Frequency [Hz]\tI\t\tQ
        args.fran[0], args.fran[1], args.step, args.time, sample)
 
 with open(fname, 'w') as f:
+    # CSV file header
+    print >> f, """# Frequency sweep data (Ver. %s)
+# Date                    : %s UTC
+# Sampling rate           : %d Hz
+# Frequency range         : %d to %d Hz
+# Frequency steps         : %d Hz
+# # of sample / frequency : %d
+
+freq,i,q""" % (__version__,
+               date.strftime('%Y-%m-%d %H:%M:%S'),
+               SAMPLE_RATE/DOWNSAMPLE_RATE,
+               args.fran[0], args.fran[1],
+               args.step,
+               sample)
     for freq in fran:
         try:
-            s.set_freq(freq)
+            s.set_freq(freq); #print 'set freq'
             r.clear()
-            s.iq_rd(); j+=1 # on
+            s.iq_tgl; #print 'on'
             sleep(0.1*dsize/1000) # depend on dsize
             ts, i, q = fixed(r, dsize)
             i_mean = np.mean(i)
             q_mean = np.mean(q)
-            print >> f, '%+e\t%+e\t%+e' % (freq, i_mean, q_mean)
+            print >> f, '%d,%f,%f' % (freq, i_mean, q_mean)
             f.flush()
             print '%+e\t%+e\t%+e' % (freq, i_mean, q_mean) # debug
-            s.iq_rd(); j+=1 # off
+            s.iq_tgl; #print 'off'
+        except RBCPError as e:
+            if e.msg == 'RBCP Error: Write failed':
+                print 'Retry'
+                s.sitcp_reset
+                sleep(10)
+            else:
+                print e.msg
+                s.sitcp_reset
+                exit()
+            if s.chk_stat[1][0] == '0x1':
+                s.iq_tgl;
+            continue
+
         except KeyboardInterrupt:
-            if j % 2: s.iq_rd() # off
+            if s.chk_stat[1][0] == '0x1':
+                s.iq_tgl; print '\nInterrupt off'
             exit()
 
 print """

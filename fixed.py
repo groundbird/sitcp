@@ -11,10 +11,15 @@ from struct import unpack
 from time import sleep
 from argparse import ArgumentParser
 import numpy as np
+import pytz
+
+__version__ = '0.0.1'
 
 def fixed(readout_obj, dsize, ds=DOWNSAMPLE_RATE):
     dsize = int(dsize)
+#     while True:
     data  = readout_obj.read(dsize)
+#         if data: break
     if data[0] != '\xff':
         raise ReadoutError('Header is broken.')
     if data[-1] != '\xee':
@@ -25,10 +30,6 @@ def fixed(readout_obj, dsize, ds=DOWNSAMPLE_RATE):
     return ts, i, q
 
 def fixed2file(readout_obj, fname, dsize):
-#     if binary:
-#         fname = '%s.bin' % fname
-#     else:
-#         fname = '%s.dat' % fname
     with open(fname, 'wb') as f:
         if dsize < BUFF:
             data = readout_obj.read(dsize)
@@ -87,10 +88,10 @@ if __name__ == '__main__':
         help   = 'Output file type. The deault type is text.')
     args = p.parse_args()
 
-    date   = datetime.today()
+    date   = datetime.utcnow()
     fname  = 'data/fixed_%s.bin' % date.strftime('%Y%m%d_%H%M%S')
     freq   = args.freq
-    sample = args.time * (SAMPLE_RATE/DOWNSAMPLE_RATE)
+    sample = args.time * (SAMPLE_RATE/DOWNSAMPLE_RATE) + 1
     dsize  = int(sample*DATA_UNIT)
     binary = args.binary
 
@@ -99,14 +100,18 @@ if __name__ == '__main__':
     r = Readout()
     r.connect()
 
+    # Initialize
+    s.wr_adc()      # Reset ADC register
+    s.wr_dac()      # Reset DAC register
+    s.register_init # Initialize ADC/DAC register
+
     # Begin the readout sequence
-    s.register_init
     s.set_freq(freq)
-    s.iq_rd() # on
+    s.iq_tgl # on
     fixed2file(r, fname, dsize)
 
     # End the readout sequence
-    s.iq_rd() # off
+    s.iq_tgl # off
     r.close()
 
     # Cut unnecessary data
@@ -115,14 +120,26 @@ if __name__ == '__main__':
         system('mv %s.aa %s' % (fname, fname))
         system('rm %s.*' % fname)
 
-    # Convert binary to text
+    # Convert binary to csv
     if not binary:
         with open(fname, 'r') as f:
-            bd = f.read()
-            td = conv_iq_data(np.array(unpack('B'*len(bd), bd)))
-            with open(fname[:-3]+'dat', 'w') as _f:
-                for d in zip(*td):
-                    print >> _f, '%d\t%+e\t%+e' % d
+            bin = f.read()
+            csv = conv_iq_data(np.array(unpack('B'*len(bin), bin)))
+            with open(fname[:-3]+'csv', 'w') as _f:
+                # CSV file header
+                print >> _f, """# Fixed point observation (Ver. %s)
+# Date                  : %s UTC
+# Sampling rate         : %d Hz
+# Number of channels    : %d
+# Observation frequency : %d Hz
+
+timestamp,i,q""" % (__version__,
+                    date.strftime('%Y-%m-%d %H:%M:%S'),
+                    SAMPLE_RATE/DOWNSAMPLE_RATE,
+                    (len(csv)-1)/2,
+                    freq)
+                for d in zip(*csv):
+                    print >> _f, '%d,%f,%f' % d
 
     # Debug
     fsize = getsize(fname)
