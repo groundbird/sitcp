@@ -4,7 +4,7 @@
 HOST            = '192.168.10.16' # IP address of SiTCP
 PORT            = 24              # TCP
 BUFF            = 512             # bytes
-N_CHANNEL       = 1
+N_CHANNEL       = 2
 SAMPLE_RATE     = 2e8
 DOWNSAMPLE_RATE = 2e5
 
@@ -39,12 +39,16 @@ class Readout(object):
 
     def __del__(self):
         self.sock.close()
+        del self
 
     def close(self):
         self.sock.close()
 
     def connect(self):
-        self.sock.connect((self.host, self.port))
+        try:
+            self.sock.connect((self.host, self.port))
+        except timeout:
+            raise ReadoutError('\n\n\tConnected a ethernet cable?\n')
 
     def read(self, buf=BUFF):
         try:
@@ -90,7 +94,7 @@ class Readout(object):
                 break
         return
 
-def adc_read(fname, dsize=11*131072):
+def adc_read(slowCtrl_obj, fname, dsize=11*131072):
     s = RBCP()
     s.adc_snapshot()
     r = Readout()
@@ -200,7 +204,7 @@ def format_data_adc_snapshot(ndarray, dsize=11):
 
 def conv_iq_data(ndarray, dsize=DATA_UNIT, ds=DOWNSAMPLE_RATE):
     """
-    1 unit のデータを timestamp[4:0] と I_i[6:0], Q_i[6:0] (i: channel) に変換
+    1 unit data を timestamp[4:0] と I_i[6:0], Q_i[6:0] (i: channel) に変換
     """
     data = ndarray.reshape(-1, dsize)
     ts = []

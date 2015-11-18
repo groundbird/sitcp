@@ -17,9 +17,7 @@ __version__ = '0.0.1'
 
 def fixed(readout_obj, dsize, ds=DOWNSAMPLE_RATE):
     dsize = int(dsize)
-#     while True:
     data  = readout_obj.read(dsize)
-#         if data: break
     if data[0] != '\xff':
         raise ReadoutError('Header is broken.')
     if data[-1] != '\xee':
