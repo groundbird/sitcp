@@ -1,11 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+"""
+SiTCP TCP data transter
+"""
+
 HOST            = '192.168.10.16' # IP address of SiTCP
 PORT            = 24              # TCP
 BUFF            = 512             # bytes
 N_CHANNEL       = 2
-SAMPLE_RATE     = 2e8
+SAMPLE_RATE     = 200e6
 DOWNSAMPLE_RATE = 2e5
 
 DATA_UNIT = N_CHANNEL*14+7  # IQ data + header/footer/timestamp [bytes]
@@ -18,8 +22,13 @@ from os import system
 from os.path import getsize
 from sys import argv
 from errno import EWOULDBLOCK, ETIMEDOUT
-from slowCtrl import RBCPError, RBCP
+from lib.slowCtrl import *
 import numpy as np
+
+__author__  = 'ISHITSUKA Hikaru <hikaru@post.kek.jp>'
+__status__  = 'development'
+__version__ = '0.0.1'
+__date__    = '%s' % datetime.fromtimestamp(getctime(abspath(__file__)))
 
 class ReadoutError(Exception):
     def __init__(self, msg):
@@ -29,6 +38,12 @@ class ReadoutError(Exception):
         return self.msg
 
 class Readout(object):
+    """
+    FPGA から TCP でデータを読み出す際に使う。
+    引数に SiTCP の IP address（default 値は 192.168.10.16）と
+    port 番号（24）、1 パケットのデータ長（512）をとる。
+    """
+
     def __init__(self, host=HOST, port=PORT, buff=BUFF):
         self.host = host
         self.port = port
@@ -59,7 +74,6 @@ class Readout(object):
             raise e
 
     def clear(self):
-#         while len(self.read()) != 0: pass
         while self.read() is not None: pass
 
     def write(self, fname, fsize=None):
@@ -94,29 +108,29 @@ class Readout(object):
                 break
         return
 
-def adc_read(slowCtrl_obj, fname, dsize=11*131072):
-    s = RBCP()
-    s.adc_snapshot()
-    r = Readout()
-    r.connect()
-    r.write(fname, dsize)
+# def adc_read(slowCtrl_obj, fname, dsize=11*131072):
+#     s = RBCP()
+#     s.adc_snapshot()
+#     r = Readout()
+#     r.connect()
+#     r.write(fname, dsize)
     
-    for i, x in enumerate(unpack_data(fname)):
-        if i % 11 == 10:
-            print '%02X' % x
-        else:
-            print '%02X' % x,
+#     for i, x in enumerate(unpack_data(fname)):
+#         if i % 11 == 10:
+#             print '%02X' % x
+#         else:
+#             print '%02X' % x,
 
-    print '-'*10
-    fsize = getsize(fname)
-    if dsize == fsize:
-        print 'Succeeded in readout data'
-    else:
-        print 'Failed in readout data'
-        print '%d bytes drop' % (dsize - fsize)
-    print 'File size is %d bytes (%d KB)' % (fsize, fsize/1024)
-    r.close()
-    return
+#     print '-'*10
+#     fsize = getsize(fname)
+#     if dsize == fsize:
+#         print 'Succeeded in readout data'
+#     else:
+#         print 'Failed in readout data'
+#         print '%d bytes drop' % (dsize - fsize)
+#     print 'File size is %d bytes (%d KB)' % (fsize, fsize/1024)
+#     r.close()
+#     return
 
 def iq_read(fname, d_len=None):
     dsize = None if d_len is None else DATA_UNIT*d_len
@@ -175,16 +189,19 @@ def conv_256dec_to_signed(xxxList, width=False):
             ret += -2**(k-1-i) * int(j)
         else:
             ret +=  2**(k-1-i) * int(j)
+
     return ret
 
 def conv_256dec_to_unsigned(xxxList):
     """
-    convert 256-decimal to unsigned
+    Convert 256-decimal to unsigned.
     """
+
     k = len(xxxList)
     ret = 0
     for i, xxx in enumerate(xxxList):
         ret += 256**(k-i-1) * xxx
+
     return int(ret)
 
 def format_data_adc_snapshot(ndarray, dsize=11):
@@ -192,6 +209,7 @@ def format_data_adc_snapshot(ndarray, dsize=11):
     ndarray <= hexdump output
     dsize is format data size.
     """
+
     data = ndarray.reshape(-1, dsize)
     ts = []
     da = []
@@ -200,12 +218,14 @@ def format_data_adc_snapshot(ndarray, dsize=11):
         ts.append(conv_256dec_to_unsigned(d[1:6])) # timestamp is 5 bytes
         da.append(conv_256dec_to_signed(d[6:8]))
         db.append(conv_256dec_to_signed(d[8:10]))
+
     return ts, da, db
 
 def conv_iq_data(ndarray, dsize=DATA_UNIT, ds=DOWNSAMPLE_RATE):
     """
     1 unit data を timestamp[4:0] と I_i[6:0], Q_i[6:0] (i: channel) に変換
     """
+
     data = ndarray.reshape(-1, dsize)
     ts = []
     i  = []
@@ -215,6 +235,7 @@ def conv_iq_data(ndarray, dsize=DATA_UNIT, ds=DOWNSAMPLE_RATE):
         for ch in range(N_CHANNEL):
             i.append(conv_256dec_to_signed(d[14*ch+ 6:14*ch+13])/ds)
             q.append(conv_256dec_to_signed(d[14*ch+13:14*ch+20])/ds)
+
     return ts, i, q
 
 def iq_data_read(ndarray, dsize=DATA_UNIT, ds=DOWNSAMPLE_RATE):
@@ -226,6 +247,7 @@ def iq_data_read(ndarray, dsize=DATA_UNIT, ds=DOWNSAMPLE_RATE):
         ts.append(conv_256dec_to_unsigned(d[1:6])) # timestamp is 5 bytes
         i.append(conv_256dec_to_signed(d[ 6:13])/ds)
         q.append(conv_256dec_to_signed(d[13:20])/ds)
+
     return ts, i, q
 
 def unpack_data(fname):
@@ -235,4 +257,3 @@ def unpack_data(fname):
 
 def unpack_data2(bin, buf=BUFF):
     return unpack('B'*buf, bin)
-    

@@ -1,0 +1,210 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module readout</title>
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>readout</strong></big></big> (version 0.0.1, 2015-11-26 00:58:48)</font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/Users/hikaru/Dropbox/gb/sitcp/lib/readout.py">/Users/hikaru/Dropbox/gb/sitcp/lib/readout.py</a></font></td></tr></table>
+    <p><tt>SiTCP&nbsp;TCP&nbsp;data&nbsp;transter</tt></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#aa55cc">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="numpy.html">numpy</a><br>
+</td><td width="25%" valign=top></td><td width="25%" valign=top></td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ee77aa">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Classes</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#ee77aa"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl>
+<dt><font face="helvetica, arial"><a href="__builtin__.html#object">__builtin__.object</a>
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="readout.html#Readout">Readout</a>
+</font></dt></dl>
+</dd>
+<dt><font face="helvetica, arial"><a href="exceptions.html#Exception">exceptions.Exception</a>(<a href="exceptions.html#BaseException">exceptions.BaseException</a>)
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="readout.html#ReadoutError">ReadoutError</a>
+</font></dt></dl>
+</dd>
+</dl>
+ <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="Readout">class <strong>Readout</strong></a>(<a href="__builtin__.html#object">__builtin__.object</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>FPGA&nbsp;から&nbsp;TCP&nbsp;でデータを読み出す際に使う。<br>
+引数に&nbsp;SiTCP&nbsp;の&nbsp;IP&nbsp;address（default&nbsp;値は&nbsp;192.168.10.16）と<br>
+port&nbsp;番号（24）、1&nbsp;パケットのデータ長（512）をとる。<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="Readout-__del__"><strong>__del__</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Readout-__init__"><strong>__init__</strong></a>(self, host<font color="#909090">='192.168.10.16'</font>, port<font color="#909090">=4660</font>, buff<font color="#909090">=255</font>)</dt></dl>
+
+<dl><dt><a name="Readout-clear"><strong>clear</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Readout-close"><strong>close</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Readout-connect"><strong>connect</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Readout-read"><strong>read</strong></a>(self, buf<font color="#909090">=255</font>)</dt></dl>
+
+<dl><dt><a name="Readout-write"><strong>write</strong></a>(self, fname, fsize<font color="#909090">=None</font>)</dt></dl>
+
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="ReadoutError">class <strong>ReadoutError</strong></a>(<a href="exceptions.html#Exception">exceptions.Exception</a>)</font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="readout.html#ReadoutError">ReadoutError</a></dd>
+<dd><a href="exceptions.html#Exception">exceptions.Exception</a></dd>
+<dd><a href="exceptions.html#BaseException">exceptions.BaseException</a></dd>
+<dd><a href="__builtin__.html#object">__builtin__.object</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="ReadoutError-__init__"><strong>__init__</strong></a>(self, msg)</dt></dl>
+
+<dl><dt><a name="ReadoutError-__str__"><strong>__str__</strong></a>(self)</dt></dl>
+
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<hr>
+Data and other attributes inherited from <a href="exceptions.html#Exception">exceptions.Exception</a>:<br>
+<dl><dt><strong>__new__</strong> = &lt;built-in method __new__ of type object&gt;<dd><tt>T.<a href="#ReadoutError-__new__">__new__</a>(S,&nbsp;...)&nbsp;-&gt;&nbsp;a&nbsp;new&nbsp;<a href="__builtin__.html#object">object</a>&nbsp;with&nbsp;type&nbsp;S,&nbsp;a&nbsp;subtype&nbsp;of&nbsp;T</tt></dl>
+
+<hr>
+Methods inherited from <a href="exceptions.html#BaseException">exceptions.BaseException</a>:<br>
+<dl><dt><a name="ReadoutError-__delattr__"><strong>__delattr__</strong></a>(...)</dt><dd><tt>x.<a href="#ReadoutError-__delattr__">__delattr__</a>('name')&nbsp;&lt;==&gt;&nbsp;del&nbsp;x.name</tt></dd></dl>
+
+<dl><dt><a name="ReadoutError-__getattribute__"><strong>__getattribute__</strong></a>(...)</dt><dd><tt>x.<a href="#ReadoutError-__getattribute__">__getattribute__</a>('name')&nbsp;&lt;==&gt;&nbsp;x.name</tt></dd></dl>
+
+<dl><dt><a name="ReadoutError-__getitem__"><strong>__getitem__</strong></a>(...)</dt><dd><tt>x.<a href="#ReadoutError-__getitem__">__getitem__</a>(y)&nbsp;&lt;==&gt;&nbsp;x[y]</tt></dd></dl>
+
+<dl><dt><a name="ReadoutError-__getslice__"><strong>__getslice__</strong></a>(...)</dt><dd><tt>x.<a href="#ReadoutError-__getslice__">__getslice__</a>(i,&nbsp;j)&nbsp;&lt;==&gt;&nbsp;x[i:j]<br>
+&nbsp;<br>
+Use&nbsp;of&nbsp;negative&nbsp;indices&nbsp;is&nbsp;not&nbsp;supported.</tt></dd></dl>
+
+<dl><dt><a name="ReadoutError-__reduce__"><strong>__reduce__</strong></a>(...)</dt></dl>
+
+<dl><dt><a name="ReadoutError-__repr__"><strong>__repr__</strong></a>(...)</dt><dd><tt>x.<a href="#ReadoutError-__repr__">__repr__</a>()&nbsp;&lt;==&gt;&nbsp;repr(x)</tt></dd></dl>
+
+<dl><dt><a name="ReadoutError-__setattr__"><strong>__setattr__</strong></a>(...)</dt><dd><tt>x.<a href="#ReadoutError-__setattr__">__setattr__</a>('name',&nbsp;value)&nbsp;&lt;==&gt;&nbsp;x.name&nbsp;=&nbsp;value</tt></dd></dl>
+
+<dl><dt><a name="ReadoutError-__setstate__"><strong>__setstate__</strong></a>(...)</dt></dl>
+
+<dl><dt><a name="ReadoutError-__unicode__"><strong>__unicode__</strong></a>(...)</dt></dl>
+
+<hr>
+Data descriptors inherited from <a href="exceptions.html#BaseException">exceptions.BaseException</a>:<br>
+<dl><dt><strong>__dict__</strong></dt>
+</dl>
+<dl><dt><strong>args</strong></dt>
+</dl>
+<dl><dt><strong>message</strong></dt>
+</dl>
+</td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#eeaa77">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt><a name="-calcsize"><strong>calcsize</strong></a>(...)</dt><dd><tt>Return&nbsp;size&nbsp;of&nbsp;C&nbsp;struct&nbsp;described&nbsp;by&nbsp;format&nbsp;string&nbsp;fmt.</tt></dd></dl>
+ <dl><dt><a name="-conv_256dec_to_signed"><strong>conv_256dec_to_signed</strong></a>(xxxList, width<font color="#909090">=False</font>)</dt></dl>
+ <dl><dt><a name="-conv_256dec_to_unsigned"><strong>conv_256dec_to_unsigned</strong></a>(xxxList)</dt><dd><tt>Convert&nbsp;256-decimal&nbsp;to&nbsp;unsigned.</tt></dd></dl>
+ <dl><dt><a name="-conv_iq_data"><strong>conv_iq_data</strong></a>(ndarray, dsize<font color="#909090">=35</font>, ds<font color="#909090">=200000.0</font>)</dt><dd><tt>1&nbsp;unit&nbsp;data&nbsp;を&nbsp;timestamp[4:0]&nbsp;と&nbsp;I_i[6:0],&nbsp;Q_i[6:0]&nbsp;(i:&nbsp;channel)&nbsp;に変換</tt></dd></dl>
+ <dl><dt><a name="-exit"><strong>exit</strong></a>(...)</dt><dd><tt><a href="#-exit">exit</a>([status])<br>
+&nbsp;<br>
+Exit&nbsp;the&nbsp;interpreter&nbsp;by&nbsp;raising&nbsp;SystemExit(status).<br>
+If&nbsp;the&nbsp;status&nbsp;is&nbsp;omitted&nbsp;or&nbsp;None,&nbsp;it&nbsp;defaults&nbsp;to&nbsp;zero&nbsp;(i.e.,&nbsp;success).<br>
+If&nbsp;the&nbsp;status&nbsp;is&nbsp;numeric,&nbsp;it&nbsp;will&nbsp;be&nbsp;used&nbsp;as&nbsp;the&nbsp;system&nbsp;exit&nbsp;status.<br>
+If&nbsp;it&nbsp;is&nbsp;another&nbsp;kind&nbsp;of&nbsp;<a href="__builtin__.html#object">object</a>,&nbsp;it&nbsp;will&nbsp;be&nbsp;printed&nbsp;and&nbsp;the&nbsp;system<br>
+exit&nbsp;status&nbsp;will&nbsp;be&nbsp;one&nbsp;(i.e.,&nbsp;failure).</tt></dd></dl>
+ <dl><dt><a name="-format_data_adc_snapshot"><strong>format_data_adc_snapshot</strong></a>(ndarray, dsize<font color="#909090">=11</font>)</dt><dd><tt>ndarray&nbsp;&lt;=&nbsp;hexdump&nbsp;output<br>
+dsize&nbsp;is&nbsp;format&nbsp;data&nbsp;size.</tt></dd></dl>
+ <dl><dt><a name="-hexdump"><strong>hexdump</strong></a>(fname)</dt></dl>
+ <dl><dt><a name="-iq_data_read"><strong>iq_data_read</strong></a>(ndarray, dsize<font color="#909090">=35</font>, ds<font color="#909090">=200000.0</font>)</dt></dl>
+ <dl><dt><a name="-iq_read"><strong>iq_read</strong></a>(fname, d_len<font color="#909090">=None</font>)</dt></dl>
+ <dl><dt><a name="-pack"><strong>pack</strong></a>(...)</dt><dd><tt>Return&nbsp;string&nbsp;containing&nbsp;values&nbsp;v1,&nbsp;v2,&nbsp;...&nbsp;packed&nbsp;according&nbsp;to&nbsp;fmt.</tt></dd></dl>
+ <dl><dt><a name="-sleep"><strong>sleep</strong></a>(...)</dt><dd><tt><a href="#-sleep">sleep</a>(seconds)<br>
+&nbsp;<br>
+Delay&nbsp;execution&nbsp;for&nbsp;a&nbsp;given&nbsp;number&nbsp;of&nbsp;seconds.&nbsp;&nbsp;The&nbsp;argument&nbsp;may&nbsp;be<br>
+a&nbsp;floating&nbsp;point&nbsp;number&nbsp;for&nbsp;subsecond&nbsp;precision.</tt></dd></dl>
+ <dl><dt><a name="-system"><strong>system</strong></a>(...)</dt><dd><tt><a href="#-system">system</a>(command)&nbsp;-&gt;&nbsp;exit_status<br>
+&nbsp;<br>
+Execute&nbsp;the&nbsp;command&nbsp;(a&nbsp;string)&nbsp;in&nbsp;a&nbsp;subshell.</tt></dd></dl>
+ <dl><dt><a name="-unpack"><strong>unpack</strong></a>(...)</dt><dd><tt>Unpack&nbsp;the&nbsp;string&nbsp;containing&nbsp;packed&nbsp;C&nbsp;structure&nbsp;data,&nbsp;according&nbsp;to&nbsp;fmt.<br>
+Requires&nbsp;len(string)&nbsp;==&nbsp;<a href="#-calcsize">calcsize</a>(fmt).</tt></dd></dl>
+ <dl><dt><a name="-unpack_data"><strong>unpack_data</strong></a>(fname)</dt></dl>
+ <dl><dt><a name="-unpack_data2"><strong>unpack_data2</strong></a>(bin, buf<font color="#909090">=255</font>)</dt></dl>
+</td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#55aa55">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><strong>ADDR_ADC</strong> = ['00', '01', '03', '25', '29', '2b', '3d', '3f', '40', '41', '42', '45', '4a', '58', 'bf', 'c1', 'cf', 'ef', 'f1', 'f2', ...]<br>
+<strong>ADDR_DAC</strong> = ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '0A', '0B', '0C', '0D', '0E', '0F', '10', '11', '12', '13', ...]<br>
+<strong>AF_INET</strong> = 2<br>
+<strong>BUFF</strong> = 255<br>
+<strong>CMD_FLAG_RX</strong> = 192<br>
+<strong>CMD_FLAG_TX</strong> = 128<br>
+<strong>DATA_ADC</strong> = ['00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', ...]<br>
+<strong>DATA_DAC</strong> = ['70', '11', '00', '10', 'ff', '00', '00', '00', '00', '7a', 'b6', 'ea', '45', '1a', '16', 'aa', 'c6', '24', '02', '00', ...]<br>
+<strong>DATA_LENGTH</strong> = 1<br>
+<strong>DATA_UNIT</strong> = 35<br>
+<strong>DOWNSAMPLE_RATE</strong> = 200000.0<br>
+<strong>ETIMEDOUT</strong> = 60<br>
+<strong>EWOULDBLOCK</strong> = 35<br>
+<strong>FS</strong> = 200000000.0<br>
+<strong>HOST</strong> = '192.168.10.16'<br>
+<strong>N_CHANNEL</strong> = 2<br>
+<strong>PKT_ID</strong> = 0<br>
+<strong>PORT</strong> = 4660<br>
+<strong>SAMPLE_RATE</strong> = 200000000.0<br>
+<strong>SOCK_DGRAM</strong> = 2<br>
+<strong>VER_TYPE</strong> = 255<br>
+<strong>__author__</strong> = 'ISHITSUKA Hikaru &lt;hikaru@post.kek.jp&gt;'<br>
+<strong>__date__</strong> = '2015-11-26 00:58:48'<br>
+<strong>__status__</strong> = 'development'<br>
+<strong>__version__</strong> = '0.0.1'<br>
+<strong>argv</strong> = ['/usr/bin/pydoc', '-w', 'lib/readout.py']<br>
+<strong>i</strong> = 31</td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#7799ee">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Author</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#7799ee"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%">ISHITSUKA&nbsp;Hikaru&nbsp;&lt;hikaru@post.kek.jp&gt;</td></tr></table>
+</body></html>

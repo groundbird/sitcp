@@ -1,11 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+"""
+SiTCP slow controller
+"""
+
 HOST = '192.168.10.16'
 PORT = 4660
 BUFF = 255
 
-# RBCP packet format
+# RBCP packet parameter
 VER_TYPE    = 0xff
 CMD_FLAG_TX = 0x80
 CMD_FLAG_RX = 0xc0
@@ -29,8 +33,15 @@ N_CHANNEL = 2
 from struct import pack, unpack
 from socket import socket, AF_INET, SOCK_DGRAM, timeout
 from time import sleep
-from sys import exit
+from sys import exit, argv
+from os.path import abspath, getctime
+from datetime import datetime
 import numpy as np
+
+__author__  = 'ISHITSUKA Hikaru <hikaru@post.kek.jp>'
+__status__  = 'development'
+__version__ = '0.0.1'
+__date__    = '%s' % datetime.fromtimestamp(getctime(abspath(__file__)))
 
 class RBCPError(Exception):
     def __init__(self, msg):
@@ -40,6 +51,12 @@ class RBCPError(Exception):
         return self.msg
 
 class RBCP(object):
+    """
+    RHEA を slow-control する際に使う。
+    引数に SiTCP の IP address（default 値は 192.168.10.16）と
+    port 番号（4660）、1 アクセスのデータ長（最大 255）をとる。
+    """
+
     def __init__(self, host=HOST, port=PORT, buff=BUFF):
         self.host = host
         self.port = port
@@ -99,17 +116,32 @@ class RBCP(object):
 
     @property
     def adc_read_enable(self):
+        """
+        ADC register read enable. (see ADC4249 datasheet, P. 23)
+        """
         self.wr('10000000', '01')
 
     @property
     def adc_write_enable(self):
+        """
+        ADC register write enable. (see ADC4249 datasheet, P. 23)
+        """
         self.wr('10000000', '00')
 
     @property
     def dac_4ena(self):
+        """
+        DAC register read/write enable. (see DAC3283 datasheet, P. 23)
+        """
         self.wr('20000017', '04')
 
     def wr_adc(self, regAddr=None, regData=None):
+        """
+        ADC register write method.
+        When you write ADC register, use this method (not use write() or wr())
+        unless there is a particular reason.
+        """
+
         self.adc_write_enable
 
         if (regAddr is None) and (regData is None):
@@ -132,6 +164,12 @@ class RBCP(object):
             raise RBCPError('Write failed.')
 
     def rd_adc(self, regAddr=None, debug=False):
+        """
+        ADC register read method.
+        When you read ADC register, use this method (not use read() or rd())
+        unless there is a particular reason.
+        """
+
         self.adc_read_enable
 
         ret = {}
@@ -159,6 +197,12 @@ class RBCP(object):
             raise RBCPError('Address must be string.')            
 
     def wr_dac(self, regAddr=None, regData=None):
+        """
+        DAC register write method.
+        When you write DAC register, use this method (not use write() or wr())
+        unless there is a particular reason.
+        """
+
         self.dac_4ena
 
         if (regAddr is None) and (regData is None):
@@ -181,6 +225,12 @@ class RBCP(object):
             raise RBCPError('write failed')
 
     def rd_dac(self, regAddr=None):
+        """
+        DAC register read method.
+        When you read DAC register, use this method (not use read() or rd())
+        unless there is a particular reason.
+        """
+
         self.dac_4ena
 
         if regAddr is None:
@@ -225,10 +275,8 @@ class RBCP(object):
     @property
     def sitcp_reset(self):
         """
-        SiTCP reset.
-        (see SiTCP manual)
+        SiTCP reset. (see SiTCP manual)
         """
-
         print 'SiTCP reset\nwait 10 seconds...'
         self.wr('ffffff10', '81') # SiTCP Reset
         sleep(10)                 # build up time (> 8 sec)
@@ -339,33 +387,42 @@ class RBCP(object):
         """
         Write phase data (POFF, PINC)
         """
+
         wrData = poff + pinc
         rdData = self.wr('40000'+format(ch, 'x').zfill(2)+'0', wrData)[1]
         if chunk_byte(wrData) != rdData:
             raise RBCPError('write data and read data not match')
         poff = rdData[:4]
         pinc = rdData[4:]
+
         return poff, pinc
 
     def rd_phase(self, ch):
         """
         Read phase data (POFF, PINC)
         """
+
         data = []
         for i in range(8):
             d = self.rd('41000'+format(ch, 'x').zfill(2)+str(i))[1][0]
             data.append(d)
         poff = data[:4]
         pinc = data[4:]
+
         return poff, pinc
 
-    def set_freq(self, freq=1e6, phase=0, channel='ALL'):
+    def set_freq(self, freq=1e6, phase=0, channel='ALL', dds_en=True):
+        """
+        Set wave parameter (frequency [Hz], phase [degree])
+        """
+
         if channel is 'ALL':
             for ch in range(N_CHANNEL):
                 self.wr_phase(ch, get_poff(phase), get_pinc(freq))
         else:
             self.wr_phase(channel, get_poff(phase), get_pinc(freq))
-        self.dds_en
+        if dds_en:
+            self.dds_en
 
     @property
     def register_init(self):
@@ -412,6 +469,7 @@ def get_pinc(freq, width=32, fs=FS, flatten=True):
     """
     Get phase increment values.
     """
+
     if -fs <= freq < 0:
         pinc = format(int((fs+freq)/fs*2**width), 'x').zfill(width/4)
         if flatten:
@@ -428,4 +486,8 @@ def get_pinc(freq, width=32, fs=FS, flatten=True):
         raise ValueError('invalid value: %s' % freq)
 
 def chunk_byte(data):
+    """
+    Convert hex string data (i.e., 'ffff')
+    to splited byte list (i.e., ['0xff', '0xff']).
+    """
     return [hex(int(data[i:i+2], 16)) for i in range(0, len(data), 2)]

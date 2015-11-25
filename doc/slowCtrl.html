@@ -1,0 +1,246 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module slowCtrl</title>
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>slowCtrl</strong></big></big> (version 0.0.1, 2015-11-26 00:44:28)</font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/Users/hikaru/Dropbox/gb/sitcp/lib/slowCtrl.py">/Users/hikaru/Dropbox/gb/sitcp/lib/slowCtrl.py</a></font></td></tr></table>
+    <p><tt>SiTCP&nbsp;slow&nbsp;controller</tt></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#aa55cc">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="numpy.html">numpy</a><br>
+</td><td width="25%" valign=top></td><td width="25%" valign=top></td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ee77aa">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Classes</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#ee77aa"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl>
+<dt><font face="helvetica, arial"><a href="__builtin__.html#object">__builtin__.object</a>
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="slowCtrl.html#RBCP">RBCP</a>
+</font></dt></dl>
+</dd>
+<dt><font face="helvetica, arial"><a href="exceptions.html#Exception">exceptions.Exception</a>(<a href="exceptions.html#BaseException">exceptions.BaseException</a>)
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="slowCtrl.html#RBCPError">RBCPError</a>
+</font></dt></dl>
+</dd>
+</dl>
+ <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="RBCP">class <strong>RBCP</strong></a>(<a href="__builtin__.html#object">__builtin__.object</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>RHEA&nbsp;を&nbsp;slow-control&nbsp;する際に使う。<br>
+引数に&nbsp;SiTCP&nbsp;の&nbsp;IP&nbsp;address（default&nbsp;値は&nbsp;192.168.10.16）と<br>
+port&nbsp;番号（4660）、1&nbsp;アクセスのデータ長（最大&nbsp;255）をとる。<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="RBCP-__del__"><strong>__del__</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="RBCP-__init__"><strong>__init__</strong></a>(self, host<font color="#909090">='192.168.10.16'</font>, port<font color="#909090">=4660</font>, buff<font color="#909090">=255</font>)</dt></dl>
+
+<dl><dt><a name="RBCP-rd"><strong>rd</strong></a>(self, addr, d_len<font color="#909090">=1</font>)</dt></dl>
+
+<dl><dt><a name="RBCP-rd_adc"><strong>rd_adc</strong></a>(self, regAddr<font color="#909090">=None</font>, debug<font color="#909090">=False</font>)</dt><dd><tt>ADC&nbsp;register&nbsp;read&nbsp;method.<br>
+When&nbsp;you&nbsp;read&nbsp;ADC&nbsp;register,&nbsp;use&nbsp;this&nbsp;method&nbsp;(not&nbsp;use&nbsp;<a href="#RBCP-read">read</a>()&nbsp;or&nbsp;<a href="#RBCP-rd">rd</a>())<br>
+unless&nbsp;there&nbsp;is&nbsp;a&nbsp;particular&nbsp;reason.</tt></dd></dl>
+
+<dl><dt><a name="RBCP-rd_dac"><strong>rd_dac</strong></a>(self, regAddr<font color="#909090">=None</font>)</dt><dd><tt>DAC&nbsp;register&nbsp;read&nbsp;method.<br>
+When&nbsp;you&nbsp;read&nbsp;DAC&nbsp;register,&nbsp;use&nbsp;this&nbsp;method&nbsp;(not&nbsp;use&nbsp;<a href="#RBCP-read">read</a>()&nbsp;or&nbsp;<a href="#RBCP-rd">rd</a>())<br>
+unless&nbsp;there&nbsp;is&nbsp;a&nbsp;particular&nbsp;reason.</tt></dd></dl>
+
+<dl><dt><a name="RBCP-rd_phase"><strong>rd_phase</strong></a>(self, ch)</dt><dd><tt>Read&nbsp;phase&nbsp;data&nbsp;(POFF,&nbsp;PINC)</tt></dd></dl>
+
+<dl><dt><a name="RBCP-read"><strong>read</strong></a>(self, addr, d_len<font color="#909090">=1</font>)</dt></dl>
+
+<dl><dt><a name="RBCP-set_freq"><strong>set_freq</strong></a>(self, freq<font color="#909090">=1000000.0</font>, phase<font color="#909090">=0</font>, channel<font color="#909090">='ALL'</font>, dds_en<font color="#909090">=True</font>)</dt><dd><tt>Set&nbsp;wave&nbsp;parameter&nbsp;(frequency&nbsp;[Hz],&nbsp;phase&nbsp;[degree])</tt></dd></dl>
+
+<dl><dt><a name="RBCP-wr"><strong>wr</strong></a>(self, addr, data)</dt></dl>
+
+<dl><dt><a name="RBCP-wr_adc"><strong>wr_adc</strong></a>(self, regAddr<font color="#909090">=None</font>, regData<font color="#909090">=None</font>)</dt><dd><tt>ADC&nbsp;register&nbsp;write&nbsp;method.<br>
+When&nbsp;you&nbsp;write&nbsp;ADC&nbsp;register,&nbsp;use&nbsp;this&nbsp;method&nbsp;(not&nbsp;use&nbsp;<a href="#RBCP-write">write</a>()&nbsp;or&nbsp;<a href="#RBCP-wr">wr</a>())<br>
+unless&nbsp;there&nbsp;is&nbsp;a&nbsp;particular&nbsp;reason.</tt></dd></dl>
+
+<dl><dt><a name="RBCP-wr_dac"><strong>wr_dac</strong></a>(self, regAddr<font color="#909090">=None</font>, regData<font color="#909090">=None</font>)</dt><dd><tt>DAC&nbsp;register&nbsp;write&nbsp;method.<br>
+When&nbsp;you&nbsp;write&nbsp;DAC&nbsp;register,&nbsp;use&nbsp;this&nbsp;method&nbsp;(not&nbsp;use&nbsp;<a href="#RBCP-write">write</a>()&nbsp;or&nbsp;<a href="#RBCP-wr">wr</a>())<br>
+unless&nbsp;there&nbsp;is&nbsp;a&nbsp;particular&nbsp;reason.</tt></dd></dl>
+
+<dl><dt><a name="RBCP-wr_phase"><strong>wr_phase</strong></a>(self, ch, poff, pinc)</dt><dd><tt>Write&nbsp;phase&nbsp;data&nbsp;(POFF,&nbsp;PINC)</tt></dd></dl>
+
+<dl><dt><a name="RBCP-write"><strong>write</strong></a>(self, addr, data)</dt></dl>
+
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>adc_read_enable</strong></dt>
+<dd><tt>ADC&nbsp;register&nbsp;read&nbsp;enable.&nbsp;(see&nbsp;ADC4249&nbsp;datasheet,&nbsp;P.&nbsp;23)</tt></dd>
+</dl>
+<dl><dt><strong>adc_reset</strong></dt>
+</dl>
+<dl><dt><strong>adc_snapshot</strong></dt>
+</dl>
+<dl><dt><strong>adc_write_enable</strong></dt>
+<dd><tt>ADC&nbsp;register&nbsp;write&nbsp;enable.&nbsp;(see&nbsp;ADC4249&nbsp;datasheet,&nbsp;P.&nbsp;23)</tt></dd>
+</dl>
+<dl><dt><strong>chk_stat</strong></dt>
+</dl>
+<dl><dt><strong>dac_4ena</strong></dt>
+<dd><tt>DAC&nbsp;register&nbsp;read/write&nbsp;enable.&nbsp;(see&nbsp;DAC3283&nbsp;datasheet,&nbsp;P.&nbsp;23)</tt></dd>
+</dl>
+<dl><dt><strong>dac_temp</strong></dt>
+<dd><tt>Read&nbsp;the&nbsp;DAC&nbsp;temperature&nbsp;in&nbsp;degrees&nbsp;of&nbsp;Celsius.</tt></dd>
+</dl>
+<dl><dt><strong>dds_en</strong></dt>
+</dl>
+<dl><dt><strong>iq_tgl</strong></dt>
+</dl>
+<dl><dt><strong>register_init</strong></dt>
+<dd><tt>Initialize&nbsp;ADC/DAC&nbsp;register.</tt></dd>
+</dl>
+<dl><dt><strong>sitcp_reset</strong></dt>
+<dd><tt>SiTCP&nbsp;reset.&nbsp;(see&nbsp;SiTCP&nbsp;manual)</tt></dd>
+</dl>
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="RBCPError">class <strong>RBCPError</strong></a>(<a href="exceptions.html#Exception">exceptions.Exception</a>)</font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="slowCtrl.html#RBCPError">RBCPError</a></dd>
+<dd><a href="exceptions.html#Exception">exceptions.Exception</a></dd>
+<dd><a href="exceptions.html#BaseException">exceptions.BaseException</a></dd>
+<dd><a href="__builtin__.html#object">__builtin__.object</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="RBCPError-__init__"><strong>__init__</strong></a>(self, msg)</dt></dl>
+
+<dl><dt><a name="RBCPError-__str__"><strong>__str__</strong></a>(self)</dt></dl>
+
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<hr>
+Data and other attributes inherited from <a href="exceptions.html#Exception">exceptions.Exception</a>:<br>
+<dl><dt><strong>__new__</strong> = &lt;built-in method __new__ of type object&gt;<dd><tt>T.<a href="#RBCPError-__new__">__new__</a>(S,&nbsp;...)&nbsp;-&gt;&nbsp;a&nbsp;new&nbsp;<a href="__builtin__.html#object">object</a>&nbsp;with&nbsp;type&nbsp;S,&nbsp;a&nbsp;subtype&nbsp;of&nbsp;T</tt></dl>
+
+<hr>
+Methods inherited from <a href="exceptions.html#BaseException">exceptions.BaseException</a>:<br>
+<dl><dt><a name="RBCPError-__delattr__"><strong>__delattr__</strong></a>(...)</dt><dd><tt>x.<a href="#RBCPError-__delattr__">__delattr__</a>('name')&nbsp;&lt;==&gt;&nbsp;del&nbsp;x.name</tt></dd></dl>
+
+<dl><dt><a name="RBCPError-__getattribute__"><strong>__getattribute__</strong></a>(...)</dt><dd><tt>x.<a href="#RBCPError-__getattribute__">__getattribute__</a>('name')&nbsp;&lt;==&gt;&nbsp;x.name</tt></dd></dl>
+
+<dl><dt><a name="RBCPError-__getitem__"><strong>__getitem__</strong></a>(...)</dt><dd><tt>x.<a href="#RBCPError-__getitem__">__getitem__</a>(y)&nbsp;&lt;==&gt;&nbsp;x[y]</tt></dd></dl>
+
+<dl><dt><a name="RBCPError-__getslice__"><strong>__getslice__</strong></a>(...)</dt><dd><tt>x.<a href="#RBCPError-__getslice__">__getslice__</a>(i,&nbsp;j)&nbsp;&lt;==&gt;&nbsp;x[i:j]<br>
+&nbsp;<br>
+Use&nbsp;of&nbsp;negative&nbsp;indices&nbsp;is&nbsp;not&nbsp;supported.</tt></dd></dl>
+
+<dl><dt><a name="RBCPError-__reduce__"><strong>__reduce__</strong></a>(...)</dt></dl>
+
+<dl><dt><a name="RBCPError-__repr__"><strong>__repr__</strong></a>(...)</dt><dd><tt>x.<a href="#RBCPError-__repr__">__repr__</a>()&nbsp;&lt;==&gt;&nbsp;repr(x)</tt></dd></dl>
+
+<dl><dt><a name="RBCPError-__setattr__"><strong>__setattr__</strong></a>(...)</dt><dd><tt>x.<a href="#RBCPError-__setattr__">__setattr__</a>('name',&nbsp;value)&nbsp;&lt;==&gt;&nbsp;x.name&nbsp;=&nbsp;value</tt></dd></dl>
+
+<dl><dt><a name="RBCPError-__setstate__"><strong>__setstate__</strong></a>(...)</dt></dl>
+
+<dl><dt><a name="RBCPError-__unicode__"><strong>__unicode__</strong></a>(...)</dt></dl>
+
+<hr>
+Data descriptors inherited from <a href="exceptions.html#BaseException">exceptions.BaseException</a>:<br>
+<dl><dt><strong>__dict__</strong></dt>
+</dl>
+<dl><dt><strong>args</strong></dt>
+</dl>
+<dl><dt><strong>message</strong></dt>
+</dl>
+</td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#eeaa77">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt><a name="-chunk_byte"><strong>chunk_byte</strong></a>(data)</dt><dd><tt>Convert&nbsp;hex&nbsp;string&nbsp;data&nbsp;(i.e.,&nbsp;'ffff')<br>
+to&nbsp;splited&nbsp;byte&nbsp;list&nbsp;(i.e.,&nbsp;['0xff',&nbsp;'0xff']).</tt></dd></dl>
+ <dl><dt><a name="-conv_int_list"><strong>conv_int_list</strong></a>(str)</dt></dl>
+ <dl><dt><a name="-exit"><strong>exit</strong></a>(...)</dt><dd><tt><a href="#-exit">exit</a>([status])<br>
+&nbsp;<br>
+Exit&nbsp;the&nbsp;interpreter&nbsp;by&nbsp;raising&nbsp;SystemExit(status).<br>
+If&nbsp;the&nbsp;status&nbsp;is&nbsp;omitted&nbsp;or&nbsp;None,&nbsp;it&nbsp;defaults&nbsp;to&nbsp;zero&nbsp;(i.e.,&nbsp;success).<br>
+If&nbsp;the&nbsp;status&nbsp;is&nbsp;numeric,&nbsp;it&nbsp;will&nbsp;be&nbsp;used&nbsp;as&nbsp;the&nbsp;system&nbsp;exit&nbsp;status.<br>
+If&nbsp;it&nbsp;is&nbsp;another&nbsp;kind&nbsp;of&nbsp;<a href="__builtin__.html#object">object</a>,&nbsp;it&nbsp;will&nbsp;be&nbsp;printed&nbsp;and&nbsp;the&nbsp;system<br>
+exit&nbsp;status&nbsp;will&nbsp;be&nbsp;one&nbsp;(i.e.,&nbsp;failure).</tt></dd></dl>
+ <dl><dt><a name="-get_pinc"><strong>get_pinc</strong></a>(freq, width<font color="#909090">=32</font>, fs<font color="#909090">=200000000.0</font>, flatten<font color="#909090">=True</font>)</dt><dd><tt>Get&nbsp;phase&nbsp;increment&nbsp;values.</tt></dd></dl>
+ <dl><dt><a name="-get_poff"><strong>get_poff</strong></a>(phase, width<font color="#909090">=32</font>, flatten<font color="#909090">=True</font>)</dt><dd><tt>Get&nbsp;phase&nbsp;offset&nbsp;values.<br>
+Specifyed&nbsp;phase&nbsp;is&nbsp;a&nbsp;degree&nbsp;(e.g.,&nbsp;45,&nbsp;60,&nbsp;...).</tt></dd></dl>
+ <dl><dt><a name="-pack"><strong>pack</strong></a>(...)</dt><dd><tt>Return&nbsp;string&nbsp;containing&nbsp;values&nbsp;v1,&nbsp;v2,&nbsp;...&nbsp;packed&nbsp;according&nbsp;to&nbsp;fmt.</tt></dd></dl>
+ <dl><dt><a name="-sleep"><strong>sleep</strong></a>(...)</dt><dd><tt><a href="#-sleep">sleep</a>(seconds)<br>
+&nbsp;<br>
+Delay&nbsp;execution&nbsp;for&nbsp;a&nbsp;given&nbsp;number&nbsp;of&nbsp;seconds.&nbsp;&nbsp;The&nbsp;argument&nbsp;may&nbsp;be<br>
+a&nbsp;floating&nbsp;point&nbsp;number&nbsp;for&nbsp;subsecond&nbsp;precision.</tt></dd></dl>
+ <dl><dt><a name="-split_str"><strong>split_str</strong></a>(str, n)</dt></dl>
+ <dl><dt><a name="-unpack"><strong>unpack</strong></a>(...)</dt><dd><tt>Unpack&nbsp;the&nbsp;string&nbsp;containing&nbsp;packed&nbsp;C&nbsp;structure&nbsp;data,&nbsp;according&nbsp;to&nbsp;fmt.<br>
+Requires&nbsp;len(string)&nbsp;==&nbsp;calcsize(fmt).</tt></dd></dl>
+</td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#55aa55">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><strong>ADDR_ADC</strong> = ['00', '01', '03', '25', '29', '2b', '3d', '3f', '40', '41', '42', '45', '4a', '58', 'bf', 'c1', 'cf', 'ef', 'f1', 'f2', ...]<br>
+<strong>ADDR_DAC</strong> = ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '0A', '0B', '0C', '0D', '0E', '0F', '10', '11', '12', '13', ...]<br>
+<strong>AF_INET</strong> = 2<br>
+<strong>BUFF</strong> = 255<br>
+<strong>CMD_FLAG_RX</strong> = 192<br>
+<strong>CMD_FLAG_TX</strong> = 128<br>
+<strong>DATA_ADC</strong> = ['00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', '00', ...]<br>
+<strong>DATA_DAC</strong> = ['70', '11', '00', '10', 'ff', '00', '00', '00', '00', '7a', 'b6', 'ea', '45', '1a', '16', 'aa', 'c6', '24', '02', '00', ...]<br>
+<strong>DATA_LENGTH</strong> = 1<br>
+<strong>FS</strong> = 200000000.0<br>
+<strong>HOST</strong> = '192.168.10.16'<br>
+<strong>N_CHANNEL</strong> = 2<br>
+<strong>PKT_ID</strong> = 0<br>
+<strong>PORT</strong> = 4660<br>
+<strong>SOCK_DGRAM</strong> = 2<br>
+<strong>VER_TYPE</strong> = 255<br>
+<strong>__author__</strong> = 'ISHITSUKA Hikaru &lt;hikaru@post.kek.jp&gt;'<br>
+<strong>__date__</strong> = '2015-11-26 00:44:28'<br>
+<strong>__status__</strong> = 'development'<br>
+<strong>__version__</strong> = '0.0.1'<br>
+<strong>argv</strong> = ['/usr/bin/pydoc', '-w', 'lib/slowCtrl.py']<br>
+<strong>i</strong> = 31</td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#7799ee">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Author</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#7799ee"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%">ISHITSUKA&nbsp;Hikaru&nbsp;&lt;hikaru@post.kek.jp&gt;</td></tr></table>
+</body></html>

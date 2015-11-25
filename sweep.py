@@ -111,7 +111,9 @@ with open(fname, 'w') as f:
 
     for freq in fran:
         try:
-            s.set_freq(freq)
+#             s.set_freq(freq)
+            s.set_freq(freq,   0, 0, False)
+            s.set_freq(freq, 180, 1)
             r.clear()
             s.iq_tgl
             sleep(args.time + args.time*0.5)
