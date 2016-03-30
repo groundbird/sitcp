@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from lib.slowCtrl import *
+from lib.readout import *
 from sys import argv, exit, stdout
 from os import system
 from os.path import getsize
@@ -10,14 +12,10 @@ from time import sleep
 from argparse import ArgumentParser
 import numpy as np
 import pytz
-from compiler.ast import flatten
 
-from lib.slowCtrl import *
-from lib.readout import *
+__version__ = '0.0.1'
 
-__version__ = '0.0.2'
-
-def fixed(readout_obj, dsize, ds=DOWNSAMPLE_RATE):
+def fixed(readout_obj, dsize):
     dsize = int(dsize)
     data  = readout_obj.read(dsize)
     if data[0] != '\xff':
@@ -29,15 +27,13 @@ def fixed(readout_obj, dsize, ds=DOWNSAMPLE_RATE):
     ts, i, q = conv_iq_data(np.array(unpack('B'*dsize, data)))
     return ts, i, q
 
-def fixed2file(readout_obj, fname, dsize, ds=DOWNSAMPLE_RATE):
+def fixed2file(readout_obj, fname, dsize):
     with open(fname, 'wb') as f:
         if dsize < BUFF:
             data = readout_obj.read(dsize)
             if len(data) != dsize:
                 raise ReadoutError('Data length mismatch.')
                 exit()
-#             ts, i, q = conv_iq_data(np.array(unpack('B'*dsize, data)))
-#             data = ts, i/ds, q/ds
             f.write(data)
             f.flush()
         else:
@@ -64,10 +60,8 @@ if __name__ == '__main__':
         '-f',
         '--freq',
         action  = 'store',
-#         nargs   = '?',
-        nargs   = N_CHANNEL,
-#         default = 1e6, # Hz
-        default = [1e6 for i in range(N_CHANNEL)],
+        nargs   = '?',
+        default = 1e6, # Hz
         type    = float,
         dest    = 'freq',
         help    = 'The observation frequency. The default value is 1e6 (1 MHz).',
@@ -95,8 +89,9 @@ if __name__ == '__main__':
     date   = datetime.utcnow()
     fname  = 'data/fixed_%s.bin' % date.strftime('%Y%m%d_%H%M%S')
     freq   = args.freq
-    sample = args.time * (SAMPLE_RATE/DOWNSAMPLE_RATE)+1
-    dsize  = int(sample*DATA_UNIT)
+    sample = args.time * SAMPLE_RATE+1
+#     dsize  = int(sample*11)
+    dsize = 11*131072
     binary = args.binary
 
     # Generate instance and connect
@@ -111,19 +106,15 @@ if __name__ == '__main__':
 
     # Begin the readout sequence
 #     s.set_freq(freq)
-#     s.set_freq(freq, 0, 0)
-    for i in range(N_CHANNEL):
-        if i % 2:
-            s.set_freq(freq[i],  45, i)
-        else:
-            s.set_freq(freq[i], 225, i)
-#     s.set_freq(freq[0],  45, 0)
-#     s.set_freq(freq[1], 225, 1)
-    s.iq_toggle('start')
+#     s.set_freq(freq, 180, 0)
+#     s.iq_tgl # on
+#     s.iq_toggle('start')
+    s.snapshot
     fixed2file(r, fname, dsize)
 
     # End the readout sequence
-    s.iq_toggle('stop')
+#     s.iq_tgl # off
+#     s.iq_toggle('stop')
     r.close()
 
     # Cut unnecessary data
@@ -139,52 +130,26 @@ if __name__ == '__main__':
             csv = conv_iq_data(np.array(unpack('B'*len(bin), bin)))
             with open(fname[:-3]+'csv', 'w') as _f:
                 # CSV file header
-#                 print >> _f, """# Fixed point observation (Ver. %s)
-# # Date                  : %s UTC
-# # Sampling rate         : %d Hz
-# # Number of channels    : %d
-# # Observation frequency : %d Hz
+                print >> _f, """# Fixed point observation (Ver. %s)
+# Date                  : %s UTC
+# Sampling rate         : %d Hz
+# Number of channels    : %d
+# Observation frequency : %d Hz
 
-# timestamp,i,q""" % (__version__,
-#                     date.strftime('%Y-%m-%d %H:%M:%S'),
-#                     SAMPLE_RATE/DOWNSAMPLE_RATE,
-#                     (len(csv)-1)/2,
-#                     freq)
-                form_head = """# Fixed point observation (Ver. {})
-# Date                  : {} UTC
-# Sampling rate         : {:.0f} Hz
-# Number of channels    : {}
-"""
-                form_head += '# Observation frequency :'+' {:.0f}'*N_CHANNEL
-                form_head += '\ntimestamp,i[j],q[j]'
-                lst = flatten([__version__,
-                               date.strftime('%Y-%m-%d %H:%M:%S'),
-                               SAMPLE_RATE/DOWNSAMPLE_RATE,
-                               N_CHANNEL, freq])
-                print form_head.format(*lst)
-                print >>_f, form_head.format(*lst)
-#                 for d in zip(*csv):
-#                     print >> _f, '%d,%f,%f' % d
-                form_data = '{}'+',{:f}'*(2*N_CHANNEL)
-#                 print form_data
-#                 for d in zip(*csv):
-#                     print d
-#                     print >>_f, form_data.format(*d)
-                ts, i, q = csv
-                i = zip(*[iter(i)]*N_CHANNEL)
-                q = zip(*[iter(q)]*N_CHANNEL)
-#                 i = i.reshape(-1, N_CHANNEL)
-#                 q = q.reshape(-1, N_CHANNEL)
-                for ts, i, q in zip(ts, i, q):
-                    lst = flatten([ts, i, q])
-                    print form_data.format(*lst)
-                    print >>_f, form_data.format(*lst)
+timestamp,i,q""" % (__version__,
+                    date.strftime('%Y-%m-%d %H:%M:%S'),
+                    SAMPLE_RATE/DOWNSAMPLE_RATE,
+                    (len(csv)-1)/2,
+                    freq)
+                for d in zip(*csv):
+                    print >> _f, '%d,%f,%f' % d
+
     # Debug
     fsize = getsize(fname)
     if fsize == dsize:
-        print '\nSucceeded in readout (%d bytes).' % fsize
-        print 'Bye-Bye (^_^)/~\n'
-        if not binary: system('rm %s' % fname)  # Remove binary file
+        print 'Succeeded in readout (%d bytes).' % fsize
+        print 'Bye-Bye (^_^)/~'
+        if not binary: system('rm %s' % fname) # Remove binary file
     else:
         print 'Failed in readout.'
         print 'Dropped %d bytes data.' % (dsize-fsize)

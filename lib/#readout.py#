@@ -41,9 +41,9 @@ class ReadoutError(Exception):
 
 class Readout(object):
     """
-    FPGA ã‹ã‚‰ TCP ã§ãƒ‡ãƒ¼ã‚¿ã‚’èª­ã¿å‡ºã™éš›ã«ä½¿ã†ã€‚
-    å¼•æ•°ã« SiTCP ã® IP addressï¼ˆdefault å€¤ã¯ 192.168.10.16ï¼‰ã¨
-    port ç•ªå·ï¼ˆ24ï¼‰ã€1 ãƒ‘ã‚±ãƒƒãƒˆã®ãƒ‡ãƒ¼ã‚¿é•·ï¼ˆ512ï¼‰ã‚’ã¨ã‚‹ã€‚
+    FPGA ’¤«’¤é TCP ’¤Ç’¥Ç’¡¼’¥¿’¤ò’ÆÉ’¤ß’½Ğ’¤¹’ºİ’¤Ë’»È’¤¦’¡£
+    ’°ú’¿ô’¤Ë SiTCP ’¤Î IP address’¡Êdefault ’ÃÍ’¤Ï 192.168.10.16’¡Ë’¤È
+    port ’ÈÖ’¹æ’¡Ê24’¡Ë’¡¢1 ’¥Ñ’¥±’¥Ã’¥È’¤Î’¥Ç’¡¼’¥¿’Ä¹’¡Ê512’¡Ë’¤ò’¤È’¤ë’¡£
     """
 
     def __init__(self, host=HOST, port=PORT, buff=BUFF):
@@ -201,7 +201,7 @@ def format_data_adc_snapshot(ndarray, dsize=11):
 
 def conv_iq_data(ndarray, dsize=DATA_UNIT, ds=DOWNSAMPLE_RATE):
     """
-    1 unit data ã‚’ timestamp[4:0] ã¨ I_i[6:0], Q_i[6:0] (i: channel) ã«å¤‰æ›
+    1 unit data ’¤ò timestamp[4:0] ’¤È I_i[6:0], Q_i[6:0] (i: channel) ’¤Ë’ÊÑ’´¹
     """
 
     data = ndarray.reshape(-1, dsize)
@@ -210,6 +210,9 @@ def conv_iq_data(ndarray, dsize=DATA_UNIT, ds=DOWNSAMPLE_RATE):
     q  = []
     for d in data:
         ts.append(conv_256dec_to_unsigned(d[1:6]))
+#         for ch in range(N_CHANNEL):
+#             i.append(conv_256dec_to_signed(d[14*ch+ 6:14*ch+13])/ds)
+#             q.append(conv_256dec_to_signed(d[14*ch+13:14*ch+20])/ds)
         for ch in range(N_CHANNEL):
             i.append(conv_256dec_to_signed(d[14*ch+ 6:14*ch+13])/ds)
             q.append(conv_256dec_to_signed(d[14*ch+13:14*ch+20])/ds)
